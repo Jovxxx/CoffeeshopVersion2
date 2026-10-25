@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Dashboard</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="customer_dashboard.css">
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Supabase Configuration -->
+    <script src="supabase.js"></script>
+</head>
+
+<body>
+
+    <header class="dashboard-header">
+
+        <h1 class="brand">☕ Coffee Shop</h1>
+
+        <div class="header-right">
+
+            <span id="welcomeText" class="welcome-text">Loading...</span>
+
+            <button id="cartToggleBtn" class="cart-toggle-btn">
+                🛒 Cart <span id="cartCount" class="cart-count">0</span>
+            </button>
+
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+
+        </div>
+
+    </header>
+
+    <main class="dashboard-main">
+
+        <div class="section-title-row">
+            <h2 class="section-title">Today's Menu</h2>
+        </div>
+
+        <p id="menuStatus" class="menu-status"></p>
+
+        <div id="menuGrid" class="menu-grid"></div>
+
+        <div class="section-title-row">
+            <h2 class="section-title">My Orders</h2>
+        </div>
+
+        <p id="ordersStatus" class="menu-status"></p>
+
+        <div id="ordersList" class="orders-list"></div>
+
+        <h2 class="section-title">Send Feedback</h2>
+
+        <div class="feedback-box">
+
+            <div class="star-rating" id="feedbackStars">
+                <button type="button" class="star-btn" data-value="1">★</button>
+                <button type="button" class="star-btn" data-value="2">★</button>
+                <button type="button" class="star-btn" data-value="3">★</button>
+                <button type="button" class="star-btn" data-value="4">★</button>
+                <button type="button" class="star-btn" data-value="5">★</button>
+            </div>
+
+            <textarea id="feedbackMessage" class="feedback-textarea" placeholder="Tell us what you think..." rows="3"></textarea>
+
+            <p id="feedbackStatusMessage"></p>
+
+            <button id="submitFeedbackBtn" class="feedback-submit-btn">Send Feedback</button>
+
+        </div>
+
+    </main>
+
+    <!-- Cart Panel -->
+    <div id="cartOverlay" class="cart-overlay"></div>
+
+    <aside id="cartPanel" class="cart-panel">
+
+        <div class="cart-panel-header">
+
+            <h2>Your Cart</h2>
+
+            <button id="cartCloseBtn" class="cart-close-btn">✕</button>
+
+        </div>
+
+        <div id="cartItems" class="cart-items"></div>
+
+        <p id="cartEmptyText" class="cart-empty-text">Your cart is empty.</p>
+
+        <div class="cart-panel-footer">
+
+            <div class="form-row">
+                <label for="orderType">Order Type</label>
+                <select id="orderType">
+                    <option value="Dine-in">Dine-in</option>
+                    <option value="Take-out">Take-out</option>
+                    <option value="Pickup">Pickup</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="paymentMethod">
+                    Payment Method <span class="optional">(Optional)</span>
+                </label>
+                <select id="paymentMethod">
+                    <option value="">Pay at counter</option>
+                    <option value="Cash">Cash</option>
+                    <option value="GCash">GCash</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="Debit Card">Debit Card</option>
+                </select>
+            </div>
+
+            <div class="cart-total-row">
+                <span>Total</span>
+                <span id="cartTotal">₱0.00</span>
+            </div>
+
+            <p id="placeOrderMessage"></p>
+
+            <button id="placeOrderBtn" class="place-order-btn">Place Order</button>
+
+        </div>
+
+    </aside>
+
+    <!-- Dashboard Logic -->
+    <script src="customer_dashboard.js"></script>
+
+</body>
+
+</html>

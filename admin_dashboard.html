@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet" href="admin_dashboard.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+</head>
+
+<body>
+
+    <div class="admin-shell">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+
+            <div class="sidebar-brand">
+                <span class="sidebar-brand-icon">☕</span>
+                <span class="sidebar-brand-text">Coffee Shop<br><small>Admin</small></span>
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <button class="nav-item active" data-section="dashboard">
+                    <span class="nav-icon">📊</span> Dashboard
+                </button>
+
+                <button class="nav-item" data-section="orders">
+                    <span class="nav-icon">🧾</span> Orders
+                </button>
+
+                <button class="nav-item" data-section="employees">
+                    <span class="nav-icon">👥</span> Employees
+                </button>
+
+                <button class="nav-item" data-section="customers">
+                    <span class="nav-icon">🙋</span> Customers
+                </button>
+
+                <button class="nav-item" data-section="menu">
+                    <span class="nav-icon">📋</span> Menu
+                </button>
+
+                <button class="nav-item" data-section="inventory">
+                    <span class="nav-icon">📦</span> Inventory
+                </button>
+
+            </nav>
+
+            <button id="logoutBtn" class="sidebar-logout">
+                <span class="nav-icon">🚪</span> Logout
+            </button>
+
+        </aside>
+
+        <!-- Main content -->
+        <div class="main-area">
+
+            <header class="topbar">
+
+                <h1 id="pageTitle" class="page-title">Dashboard</h1>
+
+                <span id="welcomeText" class="welcome-text">Loading...</span>
+
+            </header>
+
+            <main class="content-scroll">
+
+                <!-- ===================== DASHBOARD ===================== -->
+                <div class="content-section active" data-section="dashboard">
+
+                    <section class="panel">
+
+                        <div class="section-title-row">
+                            <h2 class="panel-title">Orders At a Glance</h2>
+                        </div>
+
+                        <div class="stat-cards">
+
+                            <div class="stat-card">
+                                <span class="stat-number" id="statToday">-</span>
+                                <span class="stat-label">Today</span>
+                            </div>
+
+                            <div class="stat-card">
+                                <span class="stat-number" id="statWeek">-</span>
+                                <span class="stat-label">This Week</span>
+                            </div>
+
+                            <div class="stat-card">
+                                <span class="stat-number" id="statMonth">-</span>
+                                <span class="stat-label">This Month</span>
+                            </div>
+
+                        </div>
+
+                        <p class="stat-group-label">Total Sales <span>(completed orders only)</span></p>
+
+                        <div class="stat-cards">
+
+                            <div class="stat-card sales">
+                                <span class="stat-number" id="salesToday">-</span>
+                                <span class="stat-label">Today</span>
+                            </div>
+
+                            <div class="stat-card sales">
+                                <span class="stat-number" id="salesWeek">-</span>
+                                <span class="stat-label">This Week</span>
+                            </div>
+
+                            <div class="stat-card sales">
+                                <span class="stat-number" id="salesMonth">-</span>
+                                <span class="stat-label">This Month</span>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                    <section class="panel">
+
+                        <h2 class="panel-title">Best-Selling Products</h2>
+
+                        <p class="panel-subtitle">
+                            Ranked by total quantity sold across all orders.
+                        </p>
+
+                        <p id="bestSellersStatus" class="accounts-status"></p>
+
+                        <div id="bestSellersList" class="accounts-list"></div>
+
+                    </section>
+
+                    <section class="panel">
+
+                        <h2 class="panel-title">Customer Feedback</h2>
+
+                        <div class="order-filter-tabs" id="feedbackFilterTabs">
+
+                            <button class="filter-tab active" data-filter="new">New</button>
+                            <button class="filter-tab" data-filter="all">All</button>
+
+                        </div>
+
+                        <p id="feedbackListStatus" class="accounts-status"></p>
+
+                        <div id="feedbackList" class="accounts-list"></div>
+
+                    </section>
+
+                </div>
+
+                <!-- ===================== ORDERS ===================== -->
+                <div class="content-section" data-section="orders">
+
+                    <section class="panel">
+
+                        <div class="section-title-row">
+                            <h2 class="panel-title">Order History</h2>
+                        </div>
+
+                        <p class="panel-subtitle">
+                            Read-only - status changes happen on the employee dashboard.
+                        </p>
+
+                        <div class="order-filter-tabs" id="orderHistoryFilterTabs">
+
+                            <button class="filter-tab active" data-filter="all">All</button>
+                            <button class="filter-tab" data-filter="Completed">Completed</button>
+                            <button class="filter-tab" data-filter="Cancelled">Cancelled</button>
+                            <button class="filter-tab" data-filter="active">Active</button>
+
+                        </div>
+
+                        <p id="orderHistoryStatus" class="accounts-status"></p>
+
+                        <div id="orderHistoryList" class="orders-queue-list"></div>
+
+                    </section>
+
+                </div>
+
+                <!-- ===================== EMPLOYEES ===================== -->
+                <div class="content-section" data-section="employees">
+
+                    <section class="panel">
+
+                        <h2 class="panel-title">Add New Employee</h2>
+
+                        <p class="panel-subtitle">
+                            Create a login for someone you want to work at your shop. Give them the email
+                            and temporary password afterward so they can log in at the staff login page.
+                        </p>
+
+                        <form id="addEmployeeForm" class="add-employee-form" novalidate>
+
+                            <div class="form-row">
+                                <label for="employeeName">Full Name</label>
+                                <input type="text" id="employeeName" placeholder="Enter full name" required>
+                            </div>
+
+                            <div class="form-row">
+                                <label for="employeeEmail">Email Address</label>
+                                <input type="email" id="employeeEmail" placeholder="example@email.com" required>
+                            </div>
+
+                            <div class="form-row">
+                                <label for="employeePhone">
+                                    Phone Number <span class="optional">(Optional)</span>
+                                </label>
+                                <input type="tel" id="employeePhone" placeholder="09XXXXXXXXX">
+                            </div>
+
+                            <div class="form-row">
+                                <label for="employeePassword">Temporary Password</label>
+                                <input type="text" id="employeePassword" placeholder="Minimum 8 characters" minlength="8" required>
+                            </div>
+
+                            <p id="addEmployeeMessage"></p>
+
+                            <button type="submit" id="addEmployeeBtn" class="add-btn">Add Employee</button>
+
+                        </form>
+
+                    </section>
+
+                    <section class="panel">
+
+                        <h2 class="panel-title">Employees</h2>
+
+                        <p class="panel-subtitle">
+                            Everyone currently working at your shop. Revert an account back to Customer to offboard them.
+                        </p>
+
+                        <p id="employeesStatus" class="accounts-status"></p>
+
+                        <div id="employeesList" class="accounts-list"></div>
+
+                    </section>
+
+                </div>
+
+                <!-- ===================== CUSTOMERS ===================== -->
+                <div class="content-section" data-section="customers">
+
+                    <section class="panel">
+
+                        <h2 class="panel-title">Customers</h2>
+
+                        <p class="panel-subtitle">
+                            Registered customers (names only, to keep their personal data protected).
+                        </p>
+
+                        <p id="customersStatus" class="accounts-status"></p>
+
+                        <div id="customersList" class="accounts-list"></div>
+
+                    </section>
+
+                </div>
+
+                <!-- ===================== MENU ===================== -->
+                <div class="content-section" data-section="menu">
+
+                    <section class="panel">
+
+                        <h2 class="panel-title">Category Management</h2>
+
+                        <p class="panel-subtitle">
+                            Add, edit, or remove menu categories (Coffee, Tea, Dessert, etc.).
+                        </p>
+
+                        <form id="addCategoryForm" class="add-category-form" novalidate>
+
+                            <div class="form-row">
+                                <label for="categoryName">Category Name</label>
+                                <input type="text" id="categoryName" placeholder="e.g. Coffee" required>
+                            </div>
+
+                            <div class="form-row">
+                                <label for="categoryDisplayOrder">Display Order</label>
+                                <input type="number" id="categoryDisplayOrder" min="1" placeholder="1" value="1">
+                            </div>
+
+                            <div class="form-row full-width">
+                                <label for="categoryDescription">
+                                    Description <span class="optional">(Optional)</span>
+                                </label>
+                                <input type="text" id="categoryDescription" placeholder="Short description">
+                            </div>
+
+                            <p id="addCategoryMessage"></p>
+
+                            <button type="submit" id="addCategoryBtn" class="add-btn">Add Category</button>
+
+                        </form>
+
+                        <p id="categoriesStatus" class="accounts-status"></p>
+
+                        <div id="categoriesList" class="accounts-list"></div>
+
+                    </section>
+
+                    <section class="panel">
+
+                        <h2 class="panel-title">Menu Overview</h2>
+
+                        <p class="panel-subtitle">
+                            Everything your employees have added to the menu. Prices can be corrected here if something looks wrong.
+                        </p>
+
+                        <p id="menuOverviewStatus" class="accounts-status"></p>
+
+                        <div id="menuOverviewList" class="accounts-list"></div>
+
+                    </section>
+
+                </div>
+
+                <!-- ===================== INVENTORY ===================== -->
+                <div class="content-section" data-section="inventory">
+
+                    <section class="panel">
+
+                        <h2 class="panel-title">Inventory Overview</h2>
+
+                        <p class="panel-subtitle">
+                            Read-only view. Items below their warning level are flagged Low Stock -
+                            let your employee know so they can restock.
+                        </p>
+
+                        <p id="inventoryStatus" class="accounts-status"></p>
+
+                        <div id="inventoryList" class="accounts-list"></div>
+
+                    </section>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <script src="admin_dashboard.js"></script>
+
+</body>
+
+</html>

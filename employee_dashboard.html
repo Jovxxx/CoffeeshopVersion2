@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Employee Dashboard</title>
+
+    <link rel="stylesheet" href="employee_dashboard.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+</head>
+
+<body>
+
+    <header class="dashboard-header">
+
+        <h1 class="brand">☕ Coffee Shop - Staff</h1>
+
+        <div class="header-right">
+
+            <span id="welcomeText" class="welcome-text">Loading...</span>
+
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+
+        </div>
+
+    </header>
+
+    <main class="dashboard-main">
+
+        <!-- Order Queue -->
+        <section class="panel">
+
+            <div class="section-title-row">
+                <h2 class="panel-title">Order Queue</h2>
+            </div>
+
+            <div class="order-filter-tabs" id="orderFilterTabs">
+
+                <button class="filter-tab active" data-filter="active">Active</button>
+                <button class="filter-tab" data-filter="Completed">Completed</button>
+                <button class="filter-tab" data-filter="Cancelled">Cancelled</button>
+                <button class="filter-tab" data-filter="all">All</button>
+
+            </div>
+
+            <p id="ordersStatus" class="menu-status"></p>
+
+            <div id="ordersQueueList" class="orders-queue-list"></div>
+
+        </section>
+
+        <!-- Add New Item -->
+        <section class="panel">
+
+            <h2 class="panel-title">Add New Menu Item</h2>
+
+            <form id="addItemForm" class="add-item-form" novalidate>
+
+                <div class="form-row">
+                    <label for="itemName">Item Name</label>
+                    <input type="text" id="itemName" placeholder="e.g. Mocha" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="itemCategory">Category</label>
+                    <select id="itemCategory" required>
+                        <option value="">Select category...</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="itemPrice">Price (₱)</label>
+                    <input type="number" id="itemPrice" min="0" step="0.01" placeholder="0.00" required>
+                </div>
+
+                <div class="form-row full-width">
+                    <label for="itemDescription">
+                        Description <span class="optional">(Optional)</span>
+                    </label>
+                    <input type="text" id="itemDescription" placeholder="Short description">
+                </div>
+
+                <div class="form-row full-width">
+                    <label for="itemImage">
+                        Photo <span class="optional">(Optional)</span>
+                    </label>
+                    <input type="file" id="itemImage" accept="image/*">
+                    <img id="itemImagePreview" class="image-preview" alt="" style="display:none;">
+                </div>
+
+                <p id="addItemMessage"></p>
+
+                <button type="submit" id="addItemBtn" class="add-btn">Add Item</button>
+
+            </form>
+
+        </section>
+
+        <!-- Menu List -->
+        <section class="panel">
+
+            <h2 class="panel-title">Current Menu</h2>
+
+            <p id="menuStatus" class="menu-status"></p>
+
+            <div id="menuList" class="menu-list"></div>
+
+        </section>
+
+        <!-- Add New Ingredient -->
+        <section class="panel">
+
+            <h2 class="panel-title">Add New Ingredient</h2>
+
+            <form id="addIngredientForm" class="add-item-form" novalidate>
+
+                <div class="form-row">
+                    <label for="ingredientName">Ingredient Name</label>
+                    <input type="text" id="ingredientName" placeholder="e.g. Coffee Beans" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="ingredientUnit">Unit</label>
+                    <select id="ingredientUnit" required>
+                        <option value="">Select unit...</option>
+                        <option value="g">grams (g)</option>
+                        <option value="kg">kilograms (kg)</option>
+                        <option value="ml">milliliters (ml)</option>
+                        <option value="l">liters (l)</option>
+                        <option value="pcs">pieces (pcs)</option>
+                        <option value="oz">ounces (oz)</option>
+                        <option value="lb">pounds (lb)</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="ingredientStock">Initial Stock</label>
+                    <input type="number" id="ingredientStock" min="0" step="0.01" placeholder="0" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="ingredientReorder">
+                        Low Stock Warning Level
+                    </label>
+                    <input type="number" id="ingredientReorder" min="0" step="0.01" placeholder="0" required>
+                </div>
+
+                <p id="addIngredientMessage"></p>
+
+                <button type="submit" id="addIngredientBtn" class="add-btn">Add Ingredient</button>
+
+            </form>
+
+        </section>
+
+        <!-- Inventory List -->
+        <section class="panel">
+
+            <h2 class="panel-title">Inventory</h2>
+
+            <p class="panel-subtitle">
+                Restock an ingredient after buying more of it. Items below their warning level are flagged Low Stock.
+            </p>
+
+            <p id="inventoryStatus" class="menu-status"></p>
+
+            <div id="inventoryList" class="menu-list"></div>
+
+        </section>
+
+        <!-- Recipe Management -->
+        <section class="panel">
+
+            <h2 class="panel-title">Recipes</h2>
+
+            <p class="panel-subtitle">
+                Tell the system what each menu item is made of, so stock deducts automatically when an order comes in.
+            </p>
+
+            <div class="form-row">
+                <label for="recipeMenuSelect">Menu Item</label>
+                <select id="recipeMenuSelect">
+                    <option value="">Select a menu item...</option>
+                </select>
+            </div>
+
+            <p id="recipeStatus" class="menu-status"></p>
+
+            <div id="recipeIngredientsList" class="menu-list"></div>
+
+            <form id="addRecipeIngredientForm" class="add-item-form recipe-add-form" novalidate>
+
+                <div class="form-row">
+                    <label for="recipeIngredientSelect">Ingredient</label>
+                    <select id="recipeIngredientSelect" required>
+                        <option value="">Select ingredient...</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <label for="recipeQuantityRequired">Amount Used</label>
+                    <input type="number" id="recipeQuantityRequired" min="0.01" step="0.01" placeholder="e.g. 18" required>
+                </div>
+
+                <p id="recipeMessage"></p>
+
+                <button type="submit" id="addRecipeIngredientBtn" class="add-btn">Add to Recipe</button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <script src="employee_dashboard.js"></script>
+
+</body>
+
+</html>

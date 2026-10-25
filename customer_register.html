@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Customer Registration</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="customer_register.css">
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Supabase Configuration -->
+    <script src="supabase.js"></script>
+</head>
+
+<body>
+
+    <a href="index.html" class="back-link">Back</a>
+
+    <div class="register-box">
+
+        <h2 class="head-text">Customer Registration</h2>
+        <p class="subtitle">
+            Create your account to order your favorite drinks and food.
+        </p>
+
+        <form id="registerForm" novalidate>
+
+            <!-- Full Name -->
+            <div class="form-row">
+                <label for="fullName">Full Name</label>
+
+                <input
+                    type="text"
+                    id="fullName"
+                    name="full_name"
+                    placeholder="Enter your full name"
+                    autocomplete="name"
+                    required>
+            </div>
+
+            <!-- Email -->
+            <div class="form-row">
+                <label for="email">Email Address</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="example@email.com"
+                    autocomplete="email"
+                    required>
+            </div>
+
+            <!-- Phone -->
+            <div class="form-row">
+                <label for="phone">
+                    Phone Number
+                    <span class="optional">(Optional)</span>
+                </label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    placeholder="09XXXXXXXXX"
+                    autocomplete="tel">
+            </div>
+
+            <!-- Password -->
+            <div class="form-row">
+
+                <label for="password">
+               Password
+
+               <span
+                 id="passwordInfo"
+                 class="password-info"
+                 title="Password Requirementss
+✅ At least 8 characters
+✅ One uppercase letter
+✅ One lowercase letter
+✅ One number
+✅ One special character">
+
+                   ⓘ
+
+                 </span>
+
+                <div class="password-wrapper">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Minimum of 8 characters"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required>
+
+                    <button
+                        type="button"
+                        id="togglePassword"
+                        class="toggle-password">
+
+                        Show
+
+                    </button>
+
+                </div>
+
+                <small id="passwordStrength"></small>
+
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-row">
+
+                <label for="confirmPassword">
+
+                    Confirm Password
+
+                </label>
+
+                <div class="password-wrapper">
+
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirm_password"
+                        placeholder="Re-enter your password"
+                        autocomplete="new-password"
+                        required>
+
+                    <button
+                        type="button"
+                        id="toggleConfirm"
+                        class="toggle-password">
+
+                        Show
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Terms -->
+            <div class="checkbox-row">
+
+                <input
+                    type="checkbox"
+                    id="terms"
+                    required>
+
+                <label for="terms">
+
+                    I agree to the Terms and Conditions
+
+                </label>
+
+            </div>
+
+            <!-- Status Message -->
+            <p id="message"></p>
+
+            <!-- Register Button -->
+            <button
+                type="submit"
+                id="submitBtn"
+                class="register-btn">
+
+                Register
+
+            </button>
+
+        </form>
+
+        <div class="login-link">
+
+            Already have an account?
+
+            <a href="customer_login.html">
+
+                Login here
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- Registration Logic -->
+    <script src="customer_register.js"></script>
+
+</body>
+
+</html>
