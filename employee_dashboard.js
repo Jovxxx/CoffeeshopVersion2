@@ -423,6 +423,8 @@ async function updateOrderStatus(orderId, newStatus, button) {
 
     await loadOrders();
 
+    updatePendingBadge();
+
 }
 
 
@@ -1675,29 +1677,168 @@ logoutBtn.addEventListener("click", async () => {
    recipes) changes less often. Both pause while the browser tab is
    hidden and catch up the moment the employee comes back to it. */
 
-function refreshOrderQueue() {
+/* ==========================================================
+   NEW-ORDERS BADGE
+   The order queue lives in its own section now, so a new order
+   could arrive while staff are looking at Menu or Inventory.
+   The badge on the Orders tab shows how many are still Pending.
+========================================================== */
 
-    loadOrders(true);
+const pendingBadge = document.getElementById("pendingBadge");
+
+async function updatePendingBadge() {
+
+    const { count, error } = await db
+
+        .from("orders")
+
+        .select("*", { count: "exact", head: true })
+
+        .eq("order_status", "Pending");
+
+    if (error) {
+
+        console.error(error);
+        return;
+
+    }
+
+    if (count > 0) {
+
+        pendingBadge.textContent = count;
+        pendingBadge.style.display = "";
+
+    } else {
+
+        pendingBadge.style.display = "none";
+
+    }
 
 }
 
-async function refreshEverythingElse() {
 
-    loadMenu(true);
+/* ==========================================================
+   SIDEBAR NAVIGATION
+   Shows one section at a time. Purely a display toggle - none of
+   the loading/saving code above cares which section is visible.
+========================================================== */
 
-    loadInventory(true);
+const NAV_TITLES = {
 
-    loadCategories(true);
+    orders: "Orders",
+    menu: "Menu",
+    inventory: "Inventory",
+    recipes: "Recipes"
 
-    /* menu options first, so the recipe list below is only
-       reloaded if that menu item is still there */
+};
 
-    await loadRecipeMenuOptions(true);
+function getActiveSection() {
 
-    loadRecipeIngredientOptions(true);
+    const activeNav = document.querySelector(".nav-item.active");
 
-    if (recipeMenuSelect.value) {
-        loadRecipeForMenuItem(recipeMenuSelect.value, true);
+    return activeNav ? activeNav.dataset.section : "orders";
+
+}
+
+document.querySelectorAll(".nav-item").forEach((item) => {
+
+    item.addEventListener("click", () => {
+
+        const section = item.dataset.section;
+
+        document
+
+            .querySelectorAll(".nav-item")
+
+            .forEach((navBtn) => navBtn.classList.remove("active"));
+
+        item.classList.add("active");
+
+        document
+
+            .querySelectorAll(".content-section")
+
+            .forEach((panel) => {
+
+                panel.classList.toggle("active", panel.dataset.section === section);
+
+            });
+
+        document.getElementById("pageTitle").textContent = NAV_TITLES[section] || "Orders";
+
+        /* Show fresh data straight away instead of whatever was
+           loaded the last time this section was open */
+
+        refreshActiveSection();
+
+    });
+
+});
+
+
+/* ==========================================================
+   BACKGROUND REFRESH
+   Nothing needs a refresh button: the Orders badge and queue check
+   most often (new orders need to be noticed quickly), and whichever
+   other section is open refreshes less often. Hidden sections are
+   skipped, and everything pauses while the browser tab is hidden
+   and catches up the moment the employee comes back to it.
+========================================================== */
+
+function refreshOrderQueue() {
+
+    updatePendingBadge();
+
+    if (getActiveSection() === "orders") {
+        loadOrders(true);
+    }
+
+}
+
+const SECTION_REFRESHERS = {
+
+    orders: () => {
+
+        refreshOrderQueue();
+
+    },
+
+    menu: () => {
+
+        loadMenu(true);
+        loadCategories(true);
+
+    },
+
+    inventory: () => {
+
+        loadInventory(true);
+
+    },
+
+    recipes: async () => {
+
+        /* menu options first, so the recipe list below is only
+           reloaded if that menu item is still there */
+
+        await loadRecipeMenuOptions(true);
+
+        loadRecipeIngredientOptions(true);
+
+        if (recipeMenuSelect.value) {
+            loadRecipeForMenuItem(recipeMenuSelect.value, true);
+        }
+
+    }
+
+};
+
+function refreshActiveSection() {
+
+    const refresher = SECTION_REFRESHERS[getActiveSection()];
+
+    if (refresher) {
+        refresher();
     }
 
 }
@@ -1712,8 +1853,8 @@ setInterval(() => {
 
 setInterval(() => {
 
-    if (!document.hidden) {
-        refreshEverythingElse();
+    if (!document.hidden && getActiveSection() !== "orders") {
+        refreshActiveSection();
     }
 
 }, 20000);
@@ -1722,8 +1863,8 @@ document.addEventListener("visibilitychange", () => {
 
     if (!document.hidden) {
 
-        refreshOrderQueue();
-        refreshEverythingElse();
+        updatePendingBadge();
+        refreshActiveSection();
 
     }
 
@@ -1741,6 +1882,8 @@ document.addEventListener("visibilitychange", () => {
     welcomeText.textContent = `Welcome, ${profile.full_name} (${profile.role})`;
 
     await loadOrders();
+
+    updatePendingBadge();
 
     await loadCategories();
 
